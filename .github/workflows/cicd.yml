@@ -1,0 +1,36 @@
+
+name: Deploy Website Using Self-Hosted Runner
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, linux, x64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check runner
+        run: |
+          echo "Running on self-hosted EC2 runner"
+          whoami
+          hostname
+
+      - name: Deploy website to Nginx
+        run: |
+          set -eu
+          test -f index.html
+          install -m 644 index.html /var/www/html/index.html
+          echo "Website deployed successfully"
+
+      - name: Verify deployment
+        run: |
+          curl --fail http://localhost/
